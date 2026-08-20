@@ -2,18 +2,33 @@
 // config/database.php
 session_start();
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', ''); // Change if you have a MySQL password
-define('DB_NAME', 'school_result');
-define('SITE_URL', 'http://localhost/School');
+// Database settings.
+// On Wasmer Edge these are injected automatically by the managed MySQL database
+// (DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD). Falls back to the
+// local XAMPP defaults when they are not present.
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_PORT', getenv('DB_PORT') ?: '3306');
+define('DB_USER', getenv('DB_USERNAME') ?: 'root');
+define('DB_PASS', getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : ''); // Change if you have a MySQL password
+define('DB_NAME', getenv('DB_NAME') ?: 'school_result');
+define('SITE_URL', getenv('SITE_URL') ?: 'http://localhost/School');
 
 try {
-    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS);
-    // Set PDO to throw exceptions on errors
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ];
+    // Wasmer managed MySQL uses TLS with a private CA, so skip chain verification.
+    if (getenv('DB_HOST') !== false) {
+        $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+    }
+    $pdo = new PDO(
+        "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+        DB_USER,
+        DB_PASS,
+        $options
+    );
 } catch (PDOException $e) {
     die("Database Connection Failed. Please contact the administrator.");
 }
