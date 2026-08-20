@@ -1,13 +1,14 @@
-kind: wasmer.io/App.v0
 name: school-report
-owner: coder-src45
-description: School Result Management System
+app_id: da_R4qIGtmUDz3J
+owner: src48
 package: .
-scaling:
-  mode: single_concurrency
+locality:
+  regions:
+  - fr-roub1
 capabilities:
   database:
     engine: mysql
-locality:
-  regions:
-    - fr-roub1
+scaling:
+  mode: single_concurrency
+kind: wasmer.io/App.v0
+description: School Result Management System

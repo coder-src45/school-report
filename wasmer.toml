@@ -1,8 +1,9 @@
 [package]
-name = "coder-src45/school-report"
+name = "src48/school-report"
 version = "0.1.0"
 description = "School Result Management System"
 entrypoint = "run"
+private = true
 
 [dependencies]
 "php/php" = "8.3.403"
